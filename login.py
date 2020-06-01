@@ -16,8 +16,8 @@ class TBLogin(object):
         self.browser = self.__init_browser()
         self.wait = WebDriverWait(self.browser, 10)
         # 输入用户名和密码
-        self.username = 'xxxxxxxxxx'
-        self.password = 'xxxxxxxxxx'
+        self.username = ''
+        self.password = ''
 
     def __init_browser(self):  # 初始化浏览器驱动
         # 使用 chromedriver
@@ -32,34 +32,34 @@ class TBLogin(object):
         # 使用 geckodriver
         profile = webdriver.FirefoxProfile()
         # 启用 https 代理
-        profile.set_preference('network.proxy.type', 1)
-        profile.set_preference('network.proxy.ssl', '127.0.0.1')
-        profile.set_preference('network.proxy.ssl_port', 8080)
+        # profile.set_preference('network.proxy.type', 1)
+        # profile.set_preference('network.proxy.ssl', '127.0.0.1')
+        # profile.set_preference('network.proxy.ssl_port', 8080)
         profile.update_preferences()
         # 添加下面两个参数防止 SSL 报错，参考自：https://www.guru99.com/ssl-certificate-error-handling-selenium.html#2
-        profile.accept_untrusted_certs = True
-        profile.assume_untrusted_cert_issuer = False
+        # profile.accept_untrusted_certs = True
+        # profile.assume_untrusted_cert_issuer = False
         self.browser = webdriver.Firefox(firefox_profile=profile)
-        self.browser.maximize_window()
+        # self.browser.maximize_window()
         return self.browser
 
     def send_key(self):  # 输入用户名和密码
-        username = self.wait.until(EC.presence_of_element_located((By.ID, 'TPL_username_1')))
+        username = self.wait.until(EC.presence_of_element_located((By.ID, 'fm-login-id')))
         username.clear()
         username.send_keys(self.username)
         time.sleep(random.uniform(1.2, 2))
-        password = self.wait.until(EC.presence_of_element_located((By.ID, 'TPL_password_1')))
+        password = self.wait.until(EC.presence_of_element_located((By.ID, 'fm-login-password')))
         password.click()
         password.clear()
         password.send_keys(self.password)
         # 判断是否出现滑块
-        if self.browser.find_element_by_id('nocaptcha').get_attribute('style') == 'display: block;':
+        if self.browser.find_element_by_id('nocaptcha-password').get_attribute('style') == 'display: block;':
             try:
                 self.move_slider()
             except:
                 print('滑块已拖动至最右边')
         time.sleep(random.uniform(1.2, 2))
-        login_button = self.wait.until(EC.presence_of_element_located((By.ID, 'J_SubmitStatic')))
+        login_button = self.wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'password-login')))
         login_button.click()
 
     def move_slider(self):
@@ -67,7 +67,8 @@ class TBLogin(object):
         action = ActionChains(self.browser)
         action.click_and_hold(slider).perform()
         # 滑块轨迹，此处为人工提取的轨迹，相关js脚本存放在 track.js 文件中，需根据实际情况做出调整
-        track_list = [4, 19, 28, 37, 44, 64, 61, 20]
+        # track_list = [4, 19, 28, 37, 44, 64, 61, 20]
+        track_list = [0, 0, 1, 8, 258]
         for track in track_list:
             action.move_by_offset(xoffset=track, yoffset=0).perform()
             # 重定义 action 可使轨迹拖动停顿感降低
